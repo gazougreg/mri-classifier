@@ -44,5 +44,5 @@ mean_values, intervals = calculate_intervals(df["ASF"], 10)
 norma(df["ASF"], intervals, mean_values )
 mean_values, intervals = calculate_intervals(df["nWBV"],10)
 norma(df["nWBV"],intervals, mean_values)
-print(df)
+#print(df)
 
