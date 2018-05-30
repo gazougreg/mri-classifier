@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 df=pd.read_csv('C:\\Users\\greg\\Desktop\\workspace\\dip\\oasis_cross-sectional.csv')
 
+# Cleaning the data
 
 df = df.drop('Delay',1)  # delete a column
 df = df.drop('Hand',1)
@@ -14,6 +15,7 @@ df = df[np.isfinite(df['Educ'])]
 df = df[np.isfinite(df['MMSE'])]
 df = df[np.isfinite(df['CDR'])]
 
+# Normalization
 
 def calculate_intervals(col,n):
     mean_values = []
@@ -37,12 +39,17 @@ def norma(col,intervals,mean_values):
             if i >= k[0] and i < k[1]:
                 col.replace(i, mean_values[j], inplace = True) # True -> replaces and saves new values
                 break
-    print(col.head())
+    # print(col.head())
 
 
 mean_values, intervals = calculate_intervals(df["ASF"], 10)
 norma(df["ASF"], intervals, mean_values )
 mean_values, intervals = calculate_intervals(df["nWBV"],10)
 norma(df["nWBV"],intervals, mean_values)
-#print(df)
+
+# Change M/F to 0/1
+
+df['M/F'].replace('M', 0, inplace = True)
+df['M/F'].replace('F', 1, inplace = True)
+print(df)
 

@@ -25,5 +25,8 @@ df = df[np.isfinite(df['Educ'])]
 df = df[np.isfinite(df['MMSE'])]
 df = df[np.isfinite(df['CDR'])]
 
+
+df['M/F'].replace('M', 0, inplace = True)
+df['M/F'].replace('F', 1, inplace = True)
 print(df)
 
