@@ -14,26 +14,23 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
-
 import logging
-logging.basicConfig(format='[%(asctime)s] %(message)s', filename='test_results.log', level=logging.INFO)
+
+
+#logging.basicConfig(format='[%(asctime)s] %(message)s', filename='test_longitudinal.log', level=logging.INFO)
 logging.info("####################################")
 logging.info("START")
-location = 'C:\\Users\\greg\\Desktop\\workspace\\dip\\oasis_cross-sectional.csv'
-df=pd.read_csv(location)
-
-
+df=pd.read_csv('C:\\Users\\greg\\Desktop\\workspace\\dip\\oasis_longitudinal.csv')
 
 # Cleaning the data
-
-df = df.drop('Delay',1)  # delete a column
 df = df.drop('Hand',1)
-df = df[np.isfinite(df['SES'])]  # delete row in "SES" with NaN
-df = df[np.isfinite(df['Educ'])]
+df = df[np.isfinite(df['SES'])]
 df = df[np.isfinite(df['MMSE'])]
-df = df[np.isfinite(df['CDR'])]
 
 # Normalization
+df['M/F'].replace('M', 0, inplace = True)
+df['M/F'].replace('F', 1, inplace = True)
+
 
 def calculate_intervals(col,n):
     mean_values = []
@@ -65,15 +62,13 @@ norma(df["ASF"], intervals, mean_values )
 mean_values, intervals = calculate_intervals(df["nWBV"],10)
 norma(df["nWBV"],intervals, mean_values)
 
-# Change M/F to 0/1
-
-df['M/F'].replace('M', 0, inplace = True)
-df['M/F'].replace('F', 1, inplace = True)
-
-df['CDR'].replace(0.0, 'a', inplace = True)
-df['CDR'].replace(0.5, 'b', inplace = True)
-df['CDR'].replace(1.0, 'c', inplace = True)
-df['CDR'].replace(2.0, 'd', inplace = True)
+# df['CDR'].replace(0.0, 'a', inplace = True)
+# df['CDR'].replace(0.5, 'b', inplace = True)
+# df['CDR'].replace(1.0, 'c', inplace = True)
+# df['CDR'].replace(2.0, 'd', inplace = True)
+df['Group'].replace('Converted', 'c', inplace = True)
+df['Group'].replace('Demented', 'd', inplace = True)
+df['Group'].replace('Nondemented', 'n', inplace = True)
 print(df.head())
 
 ########################################
@@ -85,27 +80,25 @@ print(df.shape)
 print(df.describe())
 
 # class distribution
-print(df.groupby('CDR').size())
+print(df.groupby('Group').size())
 
 # box and whisker plots
 # df.plot(kind = 'box', subplots = True, layout = (2,5), sharex = False, sharey = False)
 # plt.show()
-
-#histograms
+# histograms
 # df.hist()
 # plt.show()
-
 #scater plot matrix
 # scatter_matrix(df)
 # plt.show()
 
-##################################
+################################################
 
 # Split-out validation dataset
 array = df.values
-X = array[:,[1,2,3,4,5,7,8,9]]
-logging.info("col: 1,2,3,4,5,7,8,9")
-Y = array[:,6]
+X = array[:,[3,4,6,8,9,10,11,12,13]]
+logging.info("col: 3,4,6,8,9,10,11,12,13 CLASS: Group(2)")
+Y = array[:,2]
 # validation_size = 0.20
 # X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size = validation_size, random_state = seed)
 # # print(X)
@@ -122,8 +115,6 @@ models.append(('CART', DecisionTreeClassifier()))
 models.append(('NB', GaussianNB()))
 models.append(('SVM', SVC()))
 
-
-
 #evaluate each model in turn
 results = []
 names = []
@@ -139,3 +130,10 @@ for name, model in models:
 logging.info("END")
 ############################
 
+# Compare Algorithms
+fig = plt.figure()
+fig.suptitle('Algorithm Comparison')
+ax = fig.add_subplot(111)
+plt.boxplot(results)
+ax.set_xticklabels(names)
+plt.show()
